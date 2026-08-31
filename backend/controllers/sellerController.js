@@ -72,19 +72,29 @@ const getSellerApplications = async (req, res, next) => {
 }
 
 const approveSeller = async (req, res, next) => {
+  const session = await Seller.startSession()
+
   try {
-    const seller = await Seller.findById(req.params.id)
+    session.startTransaction()
+
+    const seller = await Seller.findById(req.params.id).session(session)
 
     if (!seller) {
       const error = new Error('Seller application not found')
       error.statusCode = 404
-      return next(error)
+      throw error
     }
 
     if (seller.status === 'approved') {
       const error = new Error('Seller is already approved')
       error.statusCode = 400
-      return next(error)
+      throw error
+    }
+
+    if (seller.status === 'suspended') {
+      const error = new Error('Suspended seller cannot be approved')
+      error.statusCode = 400
+      throw error
     }
 
     seller.status = 'approved'
@@ -92,11 +102,27 @@ const approveSeller = async (req, res, next) => {
     seller.rejectionReason = ''
     seller.rejectedAt = null
 
-    await seller.save()
+    await seller.save({ session })
 
-    await User.findByIdAndUpdate(seller.user, {
-      role: 'seller'
-    })
+    const user = await User.findByIdAndUpdate(
+      seller.user,
+      {
+        role: 'seller',
+        sellerProfile: seller._id
+      },
+      {
+        new: true,
+        session
+      }
+    )
+
+    if (!user) {
+      const error = new Error('Associated user not found')
+      error.statusCode = 404
+      throw error
+    }
+
+    await session.commitTransaction()
 
     res.status(200).json({
       success: true,
@@ -104,31 +130,41 @@ const approveSeller = async (req, res, next) => {
       seller
     })
   } catch (error) {
+    await session.abortTransaction()
     next(error)
+  } finally {
+    await session.endSession()
   }
 }
 
 const rejectSeller = async (req, res, next) => {
+  const session = await Seller.startSession()
+
   try {
-    const seller = await Seller.findById(req.params.id)
+    session.startTransaction()
+
+    const seller = await Seller.findById(req.params.id).session(session)
 
     if (!seller) {
       const error = new Error('Seller application not found')
       error.statusCode = 404
-      return next(error)
+      throw error
     }
 
     if (seller.status === 'approved') {
       const error = new Error('Approved sellers cannot be rejected')
       error.statusCode = 400
-      return next(error)
+      throw error
     }
 
     seller.status = 'rejected'
     seller.rejectionReason = req.body.reason || 'Application rejected'
     seller.rejectedAt = new Date()
+    seller.approvedAt = null
 
-    await seller.save()
+    await seller.save({ session })
+
+    await session.commitTransaction()
 
     res.status(200).json({
       success: true,
@@ -136,7 +172,10 @@ const rejectSeller = async (req, res, next) => {
       seller
     })
   } catch (error) {
+    await session.abortTransaction()
     next(error)
+  } finally {
+    await session.endSession()
   }
 }
 
