@@ -11,6 +11,7 @@ const errorMiddleware = require('./middleware/errorMiddleware')
 
 const authRoutes = require('./routes/authRoutes')
 const userRoutes = require('./routes/userRoutes')
+const sellerRoutes = require('./routes/sellerRoutes')
 
 dotenv.config()
 
@@ -55,6 +56,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/sellers', sellerRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorMiddleware)
