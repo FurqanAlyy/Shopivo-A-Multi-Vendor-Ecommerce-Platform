@@ -9,6 +9,9 @@ const connectDB = require('./config/db')
 const notFoundMiddleware = require('./middleware/notFoundMiddleware')
 const errorMiddleware = require('./middleware/errorMiddleware')
 
+const authRoutes = require('./routes/authRoutes')
+const userRoutes = require('./routes/userRoutes')
+
 dotenv.config()
 
 connectDB()
@@ -49,6 +52,9 @@ app.get('/', (req, res) => {
     message: 'Multi-vendor e-commerce API is running'
   })
 })
+
+app.use('/api/auth', authRoutes)
+app.use('/api/users', userRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorMiddleware)
