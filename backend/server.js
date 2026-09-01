@@ -14,6 +14,7 @@ const userRoutes = require('./routes/userRoutes')
 const sellerRoutes = require('./routes/sellerRoutes')
 const categoryRoutes = require('./routes/categoryRoutes')
 const productRoutes = require('./routes/productRoutes')
+const cartRoutes = require('./routes/cartRoutes')
 
 dotenv.config()
 
@@ -61,6 +62,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/sellers', sellerRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/products', productRoutes)
+app.use('/api/cart', cartRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorMiddleware)
