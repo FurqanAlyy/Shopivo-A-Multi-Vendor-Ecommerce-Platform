@@ -43,6 +43,20 @@ const checkoutValidation = [
     .withMessage('Invalid payment method')
 ]
 
+const sellerOrderStatusValidation = [
+  body('status')
+    .notEmpty()
+    .withMessage('Order status is required')
+    .isIn([
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled'
+    ])
+    .withMessage('Invalid order status')
+]
+
 module.exports = {
-  checkoutValidation
+  checkoutValidation,
+  sellerOrderStatusValidation
 }

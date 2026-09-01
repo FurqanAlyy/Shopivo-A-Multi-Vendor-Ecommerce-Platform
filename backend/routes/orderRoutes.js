@@ -5,13 +5,17 @@ const authorize = require('../middleware/roleMiddleware')
 const validateMiddleware = require('../middleware/validateMiddleware')
 
 const {
-  checkoutValidation
+  checkoutValidation,
+  sellerOrderStatusValidation
 } = require('../validators/orderValidator')
 
 const {
   checkout,
   getMyOrders,
-  getMyOrder
+  getMyOrder,
+  getSellerOrders,
+  getSellerOrder,
+  updateSellerOrderStatus
 } = require('../controllers/orderController')
 
 const router = express.Router()
@@ -26,6 +30,26 @@ router.post(
   checkoutValidation,
   validateMiddleware,
   checkout
+)
+
+router.get(
+  '/seller',
+  authorize('seller'),
+  getSellerOrders
+)
+
+router.get(
+  '/seller/:id',
+  authorize('seller'),
+  getSellerOrder
+)
+
+router.patch(
+  '/seller/:id/status',
+  authorize('seller'),
+  sellerOrderStatusValidation,
+  validateMiddleware,
+  updateSellerOrderStatus
 )
 
 router.get(

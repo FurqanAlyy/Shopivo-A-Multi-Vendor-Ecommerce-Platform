@@ -254,8 +254,253 @@ const getMyOrder = async (req, res, next) => {
   }
 }
 
+const getSellerOrders = async (req, res, next) => {
+  try {
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    })
+
+    if (!seller) {
+      const error = new Error('Approved seller account required')
+      error.statusCode = 403
+      return next(error)
+    }
+
+    const orders = await Order.find({
+      'sellerOrders.seller': seller._id
+    })
+      .populate('buyer', 'name email')
+      .sort({ createdAt: -1 })
+
+    const sellerOrders = []
+
+    for (const order of orders) {
+      const sellerOrder = order.sellerOrders.find(
+        item =>
+          item.seller.toString() ===
+          seller._id.toString()
+      )
+
+      if (sellerOrder) {
+        sellerOrders.push({
+          orderId: order._id,
+          orderNumber: order.orderNumber,
+          buyer: order.buyer,
+          shippingAddress: order.shippingAddress,
+          paymentStatus: order.paymentStatus,
+          paymentMethod: order.paymentMethod,
+          createdAt: order.createdAt,
+          ...sellerOrder.toObject()
+        })
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      count: sellerOrders.length,
+      orders: sellerOrders
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getSellerOrder = async (req, res, next) => {
+  try {
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    })
+
+    if (!seller) {
+      const error = new Error('Approved seller account required')
+      error.statusCode = 403
+      return next(error)
+    }
+
+    const order = await Order.findOne({
+      _id: req.params.id,
+      'sellerOrders.seller': seller._id
+    }).populate(
+      'buyer',
+      'name email'
+    )
+
+    if (!order) {
+      const error = new Error('Order not found')
+      error.statusCode = 404
+      return next(error)
+    }
+
+    const sellerOrder = order.sellerOrders.find(
+      item =>
+        item.seller.toString() ===
+        seller._id.toString()
+    )
+
+    res.status(200).json({
+      success: true,
+      order: {
+        orderId: order._id,
+        orderNumber: order.orderNumber,
+        buyer: order.buyer,
+        shippingAddress: order.shippingAddress,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod,
+        createdAt: order.createdAt,
+        ...sellerOrder.toObject()
+      }
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateSellerOrderStatus = async (
+  req,
+  res,
+  next
+) => {
+  const session = await mongoose.startSession()
+
+  try {
+    session.startTransaction()
+
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    }).session(session)
+
+    if (!seller) {
+      const error = new Error(
+        'Approved seller account required'
+      )
+      error.statusCode = 403
+      throw error
+    }
+
+    const order = await Order.findOne({
+      _id: req.params.id,
+      'sellerOrders.seller': seller._id
+    }).session(session)
+
+    if (!order) {
+      const error = new Error('Order not found')
+      error.statusCode = 404
+      throw error
+    }
+
+    const sellerOrder = order.sellerOrders.find(
+      item =>
+        item.seller.toString() ===
+        seller._id.toString()
+    )
+
+    if (!sellerOrder) {
+      const error = new Error('Seller order not found')
+      error.statusCode = 404
+      throw error
+    }
+
+    const currentStatus = sellerOrder.status
+    const newStatus = req.body.status
+
+    const allowedTransitions = {
+      pending: ['processing', 'cancelled'],
+      processing: ['shipped', 'cancelled'],
+      shipped: ['delivered'],
+      delivered: [],
+      cancelled: []
+    }
+
+    if (
+      !allowedTransitions[currentStatus].includes(
+        newStatus
+      )
+    ) {
+      const error = new Error(
+        `Cannot change order status from ${currentStatus} to ${newStatus}`
+      )
+      error.statusCode = 400
+      throw error
+    }
+
+    sellerOrder.status = newStatus
+
+    if (newStatus === 'delivered') {
+      sellerOrder.deliveredAt = new Date()
+    }
+
+    if (newStatus === 'cancelled') {
+      sellerOrder.cancelledAt = new Date()
+    }
+
+    updateParentOrderStatus(order)
+    
+    await order.save({ session })
+
+    await session.commitTransaction()
+
+    res.status(200).json({
+      success: true,
+      message: 'Order status updated successfully',
+      order
+    })
+  } catch (error) {
+    await session.abortTransaction()
+    next(error)
+  } finally {
+    await session.endSession()
+  }
+}
+
+const updateParentOrderStatus = order => {
+  const statuses = order.sellerOrders.map(
+    sellerOrder => sellerOrder.status
+  )
+
+  if (statuses.every(status => status === 'delivered')) {
+    order.status = 'delivered'
+    return
+  }
+
+  if (
+    statuses.every(
+      status => status === 'cancelled'
+    )
+  ) {
+    order.status = 'cancelled'
+    return
+  }
+
+  if (
+    statuses.some(
+      status => status === 'shipped'
+    )
+  ) {
+    order.status = 'shipped'
+    return
+  }
+
+  if (
+    statuses.some(
+      status => status === 'processing'
+    )
+  ) {
+    order.status = 'processing'
+    return
+  }
+
+  order.status = 'confirmed'
+}
+
 module.exports = {
   checkout,
   getMyOrders,
-  getMyOrder
+  getMyOrder,
+  getSellerOrders,
+  getSellerOrder,
+  updateSellerOrderStatus,
+  updateParentOrderStatus
 }
