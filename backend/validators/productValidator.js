@@ -55,6 +55,66 @@ const productValidation = [
     .withMessage('SKU must be between 2 and 50 characters')
 ]
 
+const productUpdateValidation = [
+  body('name')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 150 })
+    .withMessage('Product name must be between 2 and 150 characters'),
+
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ min: 10, max: 5000 })
+    .withMessage('Description must be between 10 and 5000 characters'),
+
+  body('category')
+    .optional()
+    .isMongoId()
+    .withMessage('Invalid category ID'),
+
+  body('images')
+    .optional()
+    .isArray({ min: 1 })
+    .withMessage('At least one product image is required'),
+
+  body('images.*')
+    .optional()
+    .isURL()
+    .withMessage('Each image must be a valid URL'),
+
+  body('price')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Price cannot be negative'),
+
+  body('discount')
+    .optional()
+    .isFloat({ min: 0, max: 100 })
+    .withMessage('Discount must be between 0 and 100'),
+
+  body('stock')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Stock cannot be negative'),
+
+  body('sku')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('SKU must be between 2 and 50 characters')
+]
+
+const stockValidation = [
+  body('stock')
+    .notEmpty()
+    .withMessage('Stock is required')
+    .isInt({ min: 0 })
+    .withMessage('Stock cannot be negative')
+]
+
 module.exports = {
-  productValidation
+  productValidation,
+  productUpdateValidation,
+  stockValidation
 }

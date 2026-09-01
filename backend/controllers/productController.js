@@ -191,8 +191,226 @@ const getProduct = async (req, res, next) => {
   }
 }
 
+const getMyProducts = async (req, res, next) => {
+  try {
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    })
+
+    if (!seller) {
+      const error = new Error('Approved seller account required')
+      error.statusCode = 403
+      return next(error)
+    }
+
+    const products = await Product.find({
+      seller: seller._id
+    })
+      .populate('category', 'name slug')
+      .sort({ createdAt: -1 })
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateProduct = async (req, res, next) => {
+  try {
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    })
+
+    if (!seller) {
+      const error = new Error('Approved seller account required')
+      error.statusCode = 403
+      return next(error)
+    }
+
+    const product = await Product.findOne({
+      _id: req.params.id,
+      seller: seller._id
+    })
+
+    if (!product) {
+      const error = new Error('Product not found')
+      error.statusCode = 404
+      return next(error)
+    }
+
+    const {
+      name,
+      description,
+      category,
+      images,
+      price,
+      discount,
+      stock,
+      sku,
+      variants,
+      specifications
+    } = req.body
+
+    if (category) {
+      const categoryExists = await Category.findOne({
+        _id: category,
+        isActive: true
+      })
+
+      if (!categoryExists) {
+        const error = new Error('Category not found or inactive')
+        error.statusCode = 404
+        return next(error)
+      }
+
+      product.category = category
+    }
+
+    if (sku && sku.toUpperCase() !== product.sku) {
+      const existingSku = await Product.findOne({
+        sku: sku.toUpperCase(),
+        _id: { $ne: product._id }
+      })
+
+      if (existingSku) {
+        const error = new Error('SKU already exists')
+        error.statusCode = 409
+        return next(error)
+      }
+
+      product.sku = sku
+    }
+
+    if (name !== undefined) {
+      product.name = name
+    }
+
+    if (description !== undefined) {
+      product.description = description
+    }
+
+    if (images !== undefined) {
+      product.images = images
+    }
+
+    if (price !== undefined) {
+      product.price = price
+    }
+
+    if (discount !== undefined) {
+      product.discount = discount
+    }
+
+    if (stock !== undefined) {
+      product.stock = stock
+    }
+
+    if (variants !== undefined) {
+      product.variants = variants
+    }
+
+    if (specifications !== undefined) {
+      product.specifications = specifications
+    }
+
+    await product.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      product
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateProductStock = async (req, res, next) => {
+  try {
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    })
+
+    if (!seller) {
+      const error = new Error('Approved seller account required')
+      error.statusCode = 403
+      return next(error)
+    }
+
+    const product = await Product.findOne({
+      _id: req.params.id,
+      seller: seller._id
+    })
+
+    if (!product) {
+      const error = new Error('Product not found')
+      error.statusCode = 404
+      return next(error)
+    }
+
+    product.stock = req.body.stock
+
+    await product.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Product stock updated successfully',
+      product
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const deleteProduct = async (req, res, next) => {
+  try {
+    const seller = await Seller.findOne({
+      user: req.user._id,
+      status: 'approved'
+    })
+
+    if (!seller) {
+      const error = new Error('Approved seller account required')
+      error.statusCode = 403
+      return next(error)
+    }
+
+    const product = await Product.findOne({
+      _id: req.params.id,
+      seller: seller._id
+    })
+
+    if (!product) {
+      const error = new Error('Product not found')
+      error.statusCode = 404
+      return next(error)
+    }
+
+    product.status = 'inactive'
+
+    await product.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Product deactivated successfully'
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 module.exports = {
   createProduct,
   getProducts,
-  getProduct
+  getProduct,
+  getMyProducts,
+  updateProduct,
+  updateProductStock,
+  deleteProduct
 }
