@@ -234,6 +234,15 @@ const orderSchema = new mongoose.Schema(
       ],
       required: true
     },
+    stripeSessionId: {
+      type: String,
+      default: null
+    },
+
+    stripePaymentIntentId: {
+      type: String,
+      default: null
+    },
 
     status: {
       type: String,

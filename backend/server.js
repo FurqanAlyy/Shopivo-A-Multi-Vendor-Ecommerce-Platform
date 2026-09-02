@@ -5,7 +5,9 @@ const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
+
 const connectDB = require('./config/db')
+
 const notFoundMiddleware = require('./middleware/notFoundMiddleware')
 const errorMiddleware = require('./middleware/errorMiddleware')
 
@@ -16,6 +18,11 @@ const categoryRoutes = require('./routes/categoryRoutes')
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const paymentRoutes = require('./routes/paymentRoutes')
+
+const {
+  handleStripeWebhook
+} = require('./controllers/paymentController')
 
 dotenv.config()
 
@@ -29,6 +36,12 @@ app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }))
+
+app.post(
+  '/api/payments/webhook',
+  express.raw({ type: 'application/json' }),
+  handleStripeWebhook
+)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -65,6 +78,7 @@ app.use('/api/categories', categoryRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/payments', paymentRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorMiddleware)
