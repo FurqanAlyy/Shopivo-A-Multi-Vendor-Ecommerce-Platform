@@ -45,6 +45,7 @@ router.patch(
   '/seller/:id',
   authMiddleware,
   authorize('seller'),
+  upload.array('images', 5),
   productUpdateValidation,
   validateMiddleware,
   updateProduct

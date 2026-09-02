@@ -256,7 +256,6 @@ const updateProduct = async (req, res, next) => {
       name,
       description,
       category,
-      images,
       price,
       discount,
       stock,
@@ -303,10 +302,6 @@ const updateProduct = async (req, res, next) => {
       product.description = description
     }
 
-    if (images !== undefined) {
-      product.images = images
-    }
-
     if (price !== undefined) {
       product.price = price
     }
@@ -325,6 +320,17 @@ const updateProduct = async (req, res, next) => {
 
     if (specifications !== undefined) {
       product.specifications = specifications
+    }
+
+    if (req.files?.length) {
+      const uploadedImages = []
+
+      for (const file of req.files) {
+        const result = await uploadToCloudinary(file.buffer)
+        uploadedImages.push(result.secure_url)
+      }
+
+      product.images = uploadedImages
     }
 
     await product.save()
