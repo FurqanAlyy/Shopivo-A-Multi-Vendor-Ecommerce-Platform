@@ -3,6 +3,7 @@ const express = require('express')
 const authMiddleware = require('../middleware/authMiddleware')
 const authorize = require('../middleware/roleMiddleware')
 const validateMiddleware = require('../middleware/validateMiddleware')
+const upload = require('../middleware/uploadMiddleware')
 
 const {
   productValidation,
@@ -62,6 +63,7 @@ router.post(
   '/',
   authMiddleware,
   authorize('seller'),
+  upload.array('images', 5),
   productValidation,
   validateMiddleware,
   createProduct

@@ -1,6 +1,7 @@
 const Product = require('../models/Product')
 const Seller = require('../models/Seller')
 const Category = require('../models/Category')
+const uploadToCloudinary = require('../utils/uploadToCloudinary')
 
 const generateSlug = (name) => {
   return name
@@ -52,13 +53,20 @@ const createProduct = async (req, res, next) => {
       slug = `${slug}-${Date.now()}`
     }
 
+    const uploadedImages = []
+
+    for (const file of req.files || []) {
+      const result = await uploadToCloudinary(file.buffer)
+      uploadedImages.push(result.secure_url)
+    }
+
     const product = await Product.create({
       seller: seller._id,
       category: category._id,
       name: req.body.name,
       slug,
       description: req.body.description,
-      images: req.body.images,
+      images: uploadedImages,
       price: req.body.price,
       discount: req.body.discount || 0,
       stock: req.body.stock,
