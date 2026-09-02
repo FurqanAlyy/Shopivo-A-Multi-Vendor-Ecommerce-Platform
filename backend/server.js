@@ -1,5 +1,8 @@
-const express = require('express')
 const dotenv = require('dotenv')
+
+dotenv.config()
+
+const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
@@ -24,8 +27,6 @@ const adminRoutes = require('./routes/adminRoutes')
 const {
   handleStripeWebhook
 } = require('./controllers/paymentController')
-
-dotenv.config()
 
 connectDB()
 
