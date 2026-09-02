@@ -19,6 +19,7 @@ const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 const paymentRoutes = require('./routes/paymentRoutes')
+const adminRoutes = require('./routes/adminRoutes')
 
 const {
   handleStripeWebhook
@@ -79,6 +80,7 @@ app.use('/api/products', productRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/payments', paymentRoutes)
+app.use('/api/admin', adminRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorMiddleware)
