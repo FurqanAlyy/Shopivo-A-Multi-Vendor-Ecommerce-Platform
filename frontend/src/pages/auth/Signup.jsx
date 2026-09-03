@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerUser } from '../../services/authService'
+import { useAuth } from '../../context/AuthContext'
 
 const Signup = () => {
   const navigate = useNavigate()
+  const { setUser } = useAuth()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -39,13 +41,15 @@ const Signup = () => {
     try {
       setLoading(true)
 
-      await registerUser({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      })
+      const response = await registerUser({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password
+     })
 
-      navigate('/')
+     setUser(response.user)
+
+     navigate('/')
     } catch (error) {
       setError(
         error.response?.data?.message ||
