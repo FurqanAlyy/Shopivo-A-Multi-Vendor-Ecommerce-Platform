@@ -12,6 +12,15 @@ const statusStyles = {
   cancelled: 'bg-red-50 text-red-700'
 }
 
+const statusLabels = {
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  processing: 'Processing',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled'
+}
+
 const Orders = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -21,7 +30,10 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true)
+        setError('')
+
         const response = await getMyOrders()
+
         setOrders(response.orders || [])
       } catch (error) {
         setError(
@@ -35,6 +47,18 @@ const Orders = () => {
 
     fetchOrders()
   }, [])
+
+  const formatDate = date => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  }
+
+  const formatAmount = amount => {
+    return Number(amount || 0).toLocaleString()
+  }
 
   if (loading) {
     return (
@@ -58,8 +82,21 @@ const Orders = () => {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f8faf9] px-6">
-        <div className="text-center">
-          <p className="text-red-600">{error}</p>
+        <div className="rounded-2xl border border-red-200 bg-white px-8 py-10 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <Icon name="warning" size={22} />
+          </div>
+
+          <p className="mt-4 text-sm text-red-600">
+            {error}
+          </p>
+
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-5 rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-800"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     )
@@ -111,11 +148,11 @@ const Orders = () => {
                 order.sellerOrders?.reduce(
                   (total, sellerOrder) =>
                     total +
-                    sellerOrder.items.reduce(
+                    (sellerOrder.items?.reduce(
                       (count, item) =>
-                        count + item.quantity,
+                        count + Number(item.quantity || 0),
                       0
-                    ),
+                    ) || 0),
                   0
                 ) || 0
 
@@ -125,46 +162,51 @@ const Orders = () => {
                   to={`/orders/${order._id}`}
                   className="block rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
                       <p className="text-xs uppercase tracking-wider text-slate-400">
                         Order
                       </p>
 
-                      <h2 className="mt-1 font-semibold text-slate-900">
+                      <h2 className="mt-1 truncate font-semibold text-slate-900">
                         {order.orderNumber}
                       </h2>
 
-                      <p className="mt-2 text-sm text-slate-500">
-                        {new Date(
-                          order.createdAt
-                        ).toLocaleDateString()}{' '}
-                        · {itemCount}{' '}
-                        {itemCount === 1
-                          ? 'item'
-                          : 'items'}
-                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-500">
+                        <span>{formatDate(order.createdAt)}</span>
+                        <span>·</span>
+                        <span>
+                          {itemCount}{' '}
+                          {itemCount === 1
+                            ? 'item'
+                            : 'items'}
+                        </span>
+                        <span>·</span>
+                        <span className="uppercase">
+                          {order.paymentMethod}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-6 sm:justify-end">
-                      <div className="text-left sm:text-right">
+                    <div className="flex items-center justify-between gap-5 lg:justify-end">
+                      <div>
                         <p className="text-xs uppercase tracking-wider text-slate-400">
                           Total
                         </p>
 
                         <p className="mt-1 font-semibold text-slate-900">
-                          Rs.{' '}
-                          {order.total.toLocaleString()}
+                          Rs. {formatAmount(order.total)}
                         </p>
                       </div>
 
                       <span
-                        className={`rounded-full px-3 py-1.5 text-xs font-medium capitalize ${
+                        className={`rounded-full px-3 py-1.5 text-xs font-medium ${
                           statusStyles[order.status] ||
                           'bg-slate-100 text-slate-700'
                         }`}
                       >
-                        {order.status}
+                        {statusLabels[order.status] ||
+                          order.status}
                       </span>
 
                       <Icon

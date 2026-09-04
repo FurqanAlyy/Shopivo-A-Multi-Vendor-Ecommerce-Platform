@@ -12,6 +12,22 @@ const statusStyles = {
   cancelled: 'bg-red-50 text-red-700'
 }
 
+const statusLabels = {
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  processing: 'Processing',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled'
+}
+
+const paymentStatusStyles = {
+  pending: 'text-amber-700',
+  paid: 'text-emerald-700',
+  failed: 'text-red-700',
+  refunded: 'text-purple-700'
+}
+
 const OrderDetails = () => {
   const { id } = useParams()
 
@@ -26,6 +42,7 @@ const OrderDetails = () => {
         setError('')
 
         const response = await getMyOrder(id)
+
         setOrder(response.order)
       } catch (error) {
         setError(
@@ -40,12 +57,38 @@ const OrderDetails = () => {
     fetchOrder()
   }, [id])
 
+  const formatAmount = amount => {
+    return Number(amount || 0).toLocaleString()
+  }
+
+  const formatDate = date => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    })
+  }
+
+  const formatPaymentMethod = method => {
+    if (method === 'cod') {
+      return 'Cash on Delivery'
+    }
+
+    if (method === 'stripe') {
+      return 'Stripe'
+    }
+
+    return method || 'N/A'
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f8faf9]">
         <div className="mx-auto max-w-5xl px-6 py-14">
           <div className="h-8 w-48 animate-pulse rounded-lg bg-slate-200" />
+
           <div className="mt-8 h-40 animate-pulse rounded-3xl bg-white" />
+
           <div className="mt-6 h-72 animate-pulse rounded-3xl bg-white" />
         </div>
       </div>
@@ -69,10 +112,10 @@ const OrderDetails = () => {
           </p>
 
           <Link
-            to="/products"
+            to="/orders"
             className="mt-7 inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 font-medium text-white transition hover:bg-emerald-800"
           >
-            Continue Shopping
+            My Orders
             <Icon name="arrowRight" size={18} />
           </Link>
         </div>
@@ -103,20 +146,19 @@ const OrderDetails = () => {
               </h1>
 
               <p className="mt-2 text-sm text-slate-500">
-                Placed on{' '}
-                {new Date(
-                  order.createdAt
-                ).toLocaleDateString()}
+                Placed on {formatDate(order.createdAt)}
               </p>
             </div>
 
             <span
-              className={`w-fit rounded-full px-4 py-2 text-sm font-medium capitalize ${
+              className={`w-fit rounded-full px-4 py-2 text-sm font-medium ${
                 statusStyles[order.status] ||
                 'bg-slate-100 text-slate-700'
               }`}
             >
-              {order.status}
+              {statusLabels[order.status] ||
+                order.status ||
+                'Unknown'}
             </span>
           </div>
 
@@ -126,10 +168,8 @@ const OrderDetails = () => {
                 Payment
               </p>
 
-              <p className="mt-1 font-medium capitalize text-slate-900">
-                {order.paymentMethod === 'cod'
-                  ? 'Cash on Delivery'
-                  : 'Stripe'}
+              <p className="mt-1 font-medium text-slate-900">
+                {formatPaymentMethod(order.paymentMethod)}
               </p>
             </div>
 
@@ -138,8 +178,13 @@ const OrderDetails = () => {
                 Payment Status
               </p>
 
-              <p className="mt-1 font-medium capitalize text-slate-900">
-                {order.paymentStatus}
+              <p
+                className={`mt-1 font-medium capitalize ${
+                  paymentStatusStyles[order.paymentStatus] ||
+                  'text-slate-900'
+                }`}
+              >
+                {order.paymentStatus || 'N/A'}
               </p>
             </div>
 
@@ -149,7 +194,7 @@ const OrderDetails = () => {
               </p>
 
               <p className="mt-1 font-semibold text-slate-900">
-                Rs. {order.total.toLocaleString()}
+                Rs. {formatAmount(order.total)}
               </p>
             </div>
           </div>
@@ -157,7 +202,7 @@ const OrderDetails = () => {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_330px]">
           <div className="space-y-6">
-            {order.sellerOrders.map(sellerOrder => (
+            {order.sellerOrders?.map(sellerOrder => (
               <section
                 key={sellerOrder._id}
                 className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-7"
@@ -175,19 +220,19 @@ const OrderDetails = () => {
                   </div>
 
                   <span
-                    className={`w-fit rounded-full px-3 py-1.5 text-xs font-medium capitalize ${
-                      statusStyles[
-                        sellerOrder.status
-                      ] ||
+                    className={`w-fit rounded-full px-3 py-1.5 text-xs font-medium ${
+                      statusStyles[sellerOrder.status] ||
                       'bg-slate-100 text-slate-700'
                     }`}
                   >
-                    {sellerOrder.status}
+                    {statusLabels[sellerOrder.status] ||
+                      sellerOrder.status ||
+                      'Unknown'}
                   </span>
                 </div>
 
                 <div className="divide-y divide-slate-100">
-                  {sellerOrder.items.map(item => (
+                  {sellerOrder.items?.map(item => (
                     <div
                       key={item._id}
                       className="flex gap-4 py-5"
@@ -200,9 +245,9 @@ const OrderDetails = () => {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-slate-400">
+                          <div className="flex h-full w-full items-center justify-center text-slate-400">
                             <Icon
-                              name="cart"
+                              name="box"
                               size={22}
                             />
                           </div>
@@ -219,14 +264,27 @@ const OrderDetails = () => {
                         </p>
 
                         <p className="mt-1 text-sm text-slate-500">
-                          Qty: {item.quantity}
+                          Quantity: {item.quantity}
                         </p>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                          Unit price: Rs.{' '}
+                          {formatAmount(item.unitPrice)}
+                        </p>
+
+                        {item.discount > 0 && (
+                          <p className="mt-1 text-xs text-emerald-600">
+                            {item.discount}% discount
+                          </p>
+                        )}
                       </div>
 
-                      <p className="font-semibold text-slate-900">
-                        Rs.{' '}
-                        {item.totalPrice.toLocaleString()}
-                      </p>
+                      <div className="text-right">
+                        <p className="font-semibold text-slate-900">
+                          Rs.{' '}
+                          {formatAmount(item.totalPrice)}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -239,7 +297,31 @@ const OrderDetails = () => {
 
                     <span className="font-semibold text-slate-900">
                       Rs.{' '}
-                      {sellerOrder.subtotal.toLocaleString()}
+                      {formatAmount(sellerOrder.subtotal)}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 flex justify-between text-sm">
+                    <span className="text-slate-500">
+                      Shipping
+                    </span>
+
+                    <span className="font-medium text-emerald-700">
+                      {Number(sellerOrder.shippingFee || 0) === 0
+                        ? 'Free'
+                        : `Rs. ${formatAmount(
+                            sellerOrder.shippingFee
+                          )}`}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex justify-between border-t border-slate-100 pt-3">
+                    <span className="font-medium text-slate-900">
+                      Seller total
+                    </span>
+
+                    <span className="font-semibold text-slate-900">
+                      Rs. {formatAmount(sellerOrder.total)}
                     </span>
                   </div>
                 </div>
@@ -255,34 +337,39 @@ const OrderDetails = () => {
 
               <div className="mt-5 space-y-2 text-sm">
                 <p className="font-medium text-slate-900">
-                  {order.shippingAddress.fullName}
+                  {order.shippingAddress?.fullName}
                 </p>
 
                 <p className="text-slate-500">
-                  {order.shippingAddress.phone}
+                  {order.shippingAddress?.phone}
                 </p>
 
                 <p className="leading-6 text-slate-500">
-                  {order.shippingAddress.address}
+                  {order.shippingAddress?.address}
                   <br />
-                  {order.shippingAddress.city},{' '}
-                  {order.shippingAddress.postalCode}
+                  {order.shippingAddress?.city}
+                  {order.shippingAddress?.postalCode
+                    ? `, ${order.shippingAddress.postalCode}`
+                    : ''}
                   <br />
-                  {order.shippingAddress.country}
+                  {order.shippingAddress?.country}
                 </p>
               </div>
 
               <div className="my-6 border-t border-slate-200" />
 
-              <div className="space-y-3 text-sm">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Order Summary
+              </h2>
+
+              <div className="mt-5 space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-500">
                     Subtotal
                   </span>
 
                   <span className="font-medium text-slate-900">
-                    Rs.{' '}
-                    {order.subtotal.toLocaleString()}
+                    Rs. {formatAmount(order.subtotal)}
                   </span>
                 </div>
 
@@ -292,7 +379,11 @@ const OrderDetails = () => {
                   </span>
 
                   <span className="font-medium text-emerald-700">
-                    Free
+                    {Number(order.shippingFee || 0) === 0
+                      ? 'Free'
+                      : `Rs. ${formatAmount(
+                          order.shippingFee
+                        )}`}
                   </span>
                 </div>
               </div>
@@ -305,7 +396,7 @@ const OrderDetails = () => {
                 </span>
 
                 <span className="text-xl font-semibold text-slate-900">
-                  Rs. {order.total.toLocaleString()}
+                  Rs. {formatAmount(order.total)}
                 </span>
               </div>
 
