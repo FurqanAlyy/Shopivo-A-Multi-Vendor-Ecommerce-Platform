@@ -1,74 +1,111 @@
-const categories = [
-  {
-    name: 'Electronics',
-    label: 'Popular',
-    image:
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=85',
-    className: 'md:col-span-2 md:row-span-2'
-  },
-  {
-    name: 'Fashion',
-    image:
-      'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=85',
-    className: ''
-  },
-  {
-    name: 'Home & Living',
-    image:
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85',
-    className: ''
-  }
-]
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { getCategories } from '../../services/categoryService'
+import Icon from '../ui/Icon'
 
-export default function Categories() {
+const Categories = () => {
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories()
+        setCategories(response.categories)
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  if (loading) {
+    return (
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                className="h-72 animate-pulse rounded-2xl bg-slate-200"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (!categories.length) {
+    return null
+  }
+
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-      <div className="mb-7 flex items-end justify-between">
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">
-            Browse
+    <section className="py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10">
+          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-700">
+            Explore
           </p>
 
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-            Explore categories
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+            Shop by category
           </h2>
+
+          <p className="mt-3 max-w-xl text-slate-500">
+            Discover products across our carefully selected categories.
+          </p>
         </div>
 
-        <button className="hidden items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 sm:flex">
-          View all
-          <span>→</span>
-        </button>
-      </div>
-
-      <div className="grid gap-4 md:h-[560px] md:grid-cols-3 md:grid-rows-2">
-        {categories.map(category => (
-          <a
-            href="#"
-            key={category.name}
-            className={`group relative min-h-[240px] overflow-hidden rounded-2xl ${category.className}`}
-          >
-            <img
-              src={category.image}
-              alt={category.name}
-              className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-            <div className="absolute bottom-6 left-6">
-              {category.label && (
-                <span className="mb-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-800 backdrop-blur">
-                  {category.label}
-                </span>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {categories.slice(0, 3).map((category) => (
+            <Link
+              key={category._id}
+              to={`/products?category=${category._id}`}
+              className="group relative h-72 overflow-hidden rounded-2xl bg-slate-100"
+            >
+              {category.image ? (
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-emerald-50">
+                  <span className="text-lg font-semibold text-emerald-800">
+                    {category.name}
+                  </span>
+                </div>
               )}
 
-              <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                {category.name}
-              </h3>
-            </div>
-          </a>
-        ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+              <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between p-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-white">
+                    {category.name}
+                  </h3>
+
+                  {category.description && (
+                    <p className="mt-1 line-clamp-2 text-sm text-white/80">
+                      {category.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="rounded-full bg-white/90 p-2 text-slate-900 transition group-hover:bg-emerald-700 group-hover:text-white">
+                  <Icon name="arrowRight" size={18} />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   )
 }
+
+export default Categories
