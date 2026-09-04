@@ -140,12 +140,12 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <div className="hidden items-center gap-2 lg:flex">
-                <Link
+                <p
                   to="/profile"
                   className="max-w-[130px] truncate rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700"
                 >
                   Hi, {user.name}
-                </Link>
+                </p>
 
                 {user.role === 'buyer' && (
                   <Link
