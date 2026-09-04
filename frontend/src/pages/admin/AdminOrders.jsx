@@ -74,7 +74,7 @@ const AdminOrders = () => {
   }
 
   const formatPrice = price => {
-    return `Rs. ${Number(price || 0).toLocaleString()}`
+    return `$${Number(price || 0).toLocaleString()}`
   }
 
   if (loading) {

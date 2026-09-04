@@ -102,7 +102,7 @@ const AdminOrderDetails = () => {
   }
 
   const formatPrice = value => {
-    return `Rs. ${Number(value || 0).toLocaleString()}`
+    return `$${Number(value || 0).toLocaleString()}`
   }
 
   const getItemCount = () => {
