@@ -33,7 +33,7 @@ const AdminDashboard = () => {
   }, [])
 
   const formatRevenue = value => {
-    return `Rs. ${Number(value || 0).toLocaleString()}`
+    return `$${Number(value || 0).toLocaleString()}`
   }
 
   if (loading) {
