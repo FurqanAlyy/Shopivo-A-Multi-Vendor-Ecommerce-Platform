@@ -36,40 +36,64 @@ const Products = () => {
     fetchCategories()
   }, [])
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true)
-        setError('')
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      setError('')
 
-        const params = {
-          page,
-          limit: 12,
-          sort
-        }
+      const currentSearch = searchParams.get('search') || ''
+      const currentCategory = searchParams.get('category') || ''
+      const currentMinPrice = searchParams.get('minPrice') || ''
+      const currentMaxPrice = searchParams.get('maxPrice') || ''
+      const currentSort = searchParams.get('sort') || 'newest'
+      const currentPage = Number(searchParams.get('page')) || 1
 
-        if (search.trim()) params.search = search.trim()
-        if (category) params.category = category
-        if (minPrice) params.minPrice = minPrice
-        if (maxPrice) params.maxPrice = maxPrice
+      setSearch(currentSearch)
+      setCategory(currentCategory)
+      setMinPrice(currentMinPrice)
+      setMaxPrice(currentMaxPrice)
+      setSort(currentSort)
 
-        const response = await getProducts(params)
-
-        setProducts(response.products || [])
-        setPagination(response.pagination || null)
-      } catch (error) {
-        setError(
-          error.response?.data?.message ||
-          'Failed to load products'
-        )
-        setProducts([])
-      } finally {
-        setLoading(false)
+      const params = {
+        page: currentPage,
+        limit: 12,
+        sort: currentSort
       }
-    }
 
-    fetchProducts()
-  }, [searchParams])
+      if (currentSearch.trim()) {
+        params.search = currentSearch.trim()
+      }
+
+      if (currentCategory) {
+        params.category = currentCategory
+      }
+
+      if (currentMinPrice) {
+        params.minPrice = currentMinPrice
+      }
+
+      if (currentMaxPrice) {
+        params.maxPrice = currentMaxPrice
+      }
+
+      const response = await getProducts(params)
+
+      setProducts(response.products || [])
+      setPagination(response.pagination || null)
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+        'Failed to load products'
+      )
+      setProducts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  fetchProducts()
+}, [searchParams])
 
   const updateParams = (updates = {}) => {
     const params = new URLSearchParams(searchParams)
@@ -133,7 +157,7 @@ const Products = () => {
       <Navbar />
 
       <main className="min-h-screen bg-[#f8faf9]">
-        <section className="border-b border-slate-200 bg-[#eef3ef]">
+        {/* <section className="border-b border-slate-200 bg-[#eef3ef]">
           <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
             <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-emerald-700">
               Shop
@@ -148,7 +172,7 @@ const Products = () => {
               marketplace.
             </p>
           </div>
-        </section>
+        </section> */}
 
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[240px_1fr]">

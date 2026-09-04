@@ -16,6 +16,7 @@ const ProductCard = ({ product }) => {
           <img
             src={product.images[0]}
             alt={product.name}
+            loading="lazy"
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
@@ -24,37 +25,39 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {product.discount > 0 && (
-          <span className="absolute left-3 top-3 rounded-full bg-emerald-700 px-3 py-1 text-xs font-semibold text-white">
-            {product.discount}% OFF
-          </span>
-        )}
+        <div className="absolute left-3 top-3 flex flex-col gap-2">
+          {product.discount > 0 && (
+            <span className="w-fit rounded-full bg-emerald-700 px-3 py-1 text-[11px] font-bold text-white">
+              {product.discount}% OFF
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-          {product.category?.name}
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          {product.category?.name || 'Product'}
         </p>
 
-        <h3 className="mt-1 line-clamp-2 font-medium text-slate-900 transition group-hover:text-emerald-700">
+        <h3 className="mt-1.5 line-clamp-2 text-sm font-semibold leading-5 text-slate-900 transition group-hover:text-emerald-700 sm:text-base">
           {product.name}
         </h3>
 
-        <div className="mt-2 flex items-center gap-2">
-          <span className="font-semibold text-slate-900">
-            ${discountedPrice.toFixed(2)}
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="font-bold text-slate-900">
+            Rs. {discountedPrice.toFixed(0)}
           </span>
 
           {product.discount > 0 && (
             <span className="text-sm text-slate-400 line-through">
-              ${product.price.toFixed(2)}
+              Rs. {product.price.toFixed(0)}
             </span>
           )}
         </div>
 
         {product.seller?.storeName && (
-          <p className="mt-1 text-xs text-slate-400">
-            {product.seller.storeName}
+          <p className="mt-1.5 truncate text-xs text-slate-400">
+            Sold by {product.seller.storeName}
           </p>
         )}
       </div>
