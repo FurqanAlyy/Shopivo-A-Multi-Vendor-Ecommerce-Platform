@@ -13,7 +13,7 @@ const productValidation = [
     .notEmpty()
     .withMessage('Product description is required')
     .isLength({ min: 10, max: 5000 })
-    .withMessage('Description must be between 10 and 5000 characters'),
+    .withMessage('Product description must be between 10 and 5000 characters'),
 
   body('category')
     .trim()
@@ -22,19 +22,11 @@ const productValidation = [
     .isMongoId()
     .withMessage('Invalid category ID'),
 
-  body('images')
-    .isArray({ min: 1 })
-    .withMessage('At least one product image is required'),
-
-  body('images.*')
-    .isURL()
-    .withMessage('Each image must be a valid URL'),
-
   body('price')
     .notEmpty()
     .withMessage('Price is required')
     .isFloat({ min: 0 })
-    .withMessage('Price must be a positive number'),
+    .withMessage('Price must be a valid positive number'),
 
   body('discount')
     .optional()
@@ -45,14 +37,12 @@ const productValidation = [
     .notEmpty()
     .withMessage('Stock is required')
     .isInt({ min: 0 })
-    .withMessage('Stock cannot be negative'),
+    .withMessage('Stock must be a non-negative integer'),
 
   body('sku')
     .trim()
     .notEmpty()
     .withMessage('SKU is required')
-    .isLength({ min: 2, max: 50 })
-    .withMessage('SKU must be between 2 and 50 characters')
 ]
 
 const productUpdateValidation = [

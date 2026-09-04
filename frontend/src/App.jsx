@@ -10,62 +10,55 @@ import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import PaymentSuccess from './pages/payment/PaymentSuccess'
 import PaymentCancel from './pages/payment/PaymentCancel'
+import SellerApplication from './pages/seller/SellerApplication'
+import SellerDashboard from './pages/seller/SellerDashboard'
+import ProtectedRoute from './components/ProtectedRoute'
+import MyProducts from './pages/seller/MyProducts'
+import AddProduct from './pages/seller/AddProduct'
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
 
-        <Route
-          path="/products"
-          element={<Products />}
-        />
+        <Route element={<ProtectedRoute roles={['buyer', 'seller']} />}>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
+        </Route>
 
-        <Route
-          path="/products/:id"
-          element={<ProductDetails />}
-        />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/cancel" element={<PaymentCancel />} />
 
-        <Route
-          path="/cart"
-          element={<Cart />}
-        />
+        <Route element={<ProtectedRoute roles={['buyer']} />}>
+          <Route
+            path="/seller/apply"
+            element={<SellerApplication />}
+          />
+        </Route>
 
-        <Route
-          path="/checkout"
-          element={<Checkout />}
-        />
+        <Route element={<ProtectedRoute roles={['seller']} />}>
+          <Route
+            path="/seller/dashboard"
+            element={<SellerDashboard />}
+          />
+          <Route
+            path="/seller/products"
+            element={<MyProducts />}
+          />
 
-        <Route
-          path="/orders"
-          element={<Orders />}
-        />
+          <Route
+    path="/seller/products/new"
+    element={<AddProduct />}
+  />
+        </Route>
 
-        <Route
-          path="/orders/:id"
-          element={<OrderDetails />}
-        />
-
-        <Route
-          path="/payment/success"
-          element={<PaymentSuccess />}
-        />
-
-        <Route
-          path="/payment/cancel"
-          element={<PaymentCancel />}
-        />
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-        <Route
-          path="/signup"
-          element={<Signup />}
-        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </BrowserRouter>
   )
