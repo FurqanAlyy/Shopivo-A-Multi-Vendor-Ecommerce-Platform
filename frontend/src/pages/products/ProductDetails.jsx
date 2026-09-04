@@ -4,16 +4,21 @@ import Navbar from '../../components/home/Navbar'
 import Footer from '../../components/home/Footer'
 import Icon from '../../components/ui/Icon'
 import { getProduct } from '../../services/productService'
+import { addToCart } from '../../services/cartService'
+import { useAuth } from '../../context/AuthContext'
 
 const ProductDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [product, setProduct] = useState(null)
   const [selectedImage, setSelectedImage] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [addingToCart, setAddingToCart] = useState(false)
   const [error, setError] = useState('')
+  const [cartMessage, setCartMessage] = useState('')
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -52,6 +57,34 @@ const ProductDetails = () => {
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity((current) => current - 1)
+    }
+  }
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      navigate('/login', {
+        state: {
+          from: `/products/${id}`
+        }
+      })
+
+      return
+    }
+
+    try {
+      setAddingToCart(true)
+      setCartMessage('')
+
+      await addToCart(product._id, quantity)
+
+      setCartMessage('Product added to cart')
+    } catch (error) {
+      setCartMessage(
+        error.response?.data?.message ||
+        'Failed to add product to cart'
+      )
+    } finally {
+      setAddingToCart(false)
     }
   }
 
@@ -273,12 +306,39 @@ const ProductDetails = () => {
               )}
 
               <button
-                disabled={product.stock === 0}
+                onClick={handleAddToCart}
+                disabled={product.stock === 0 || addingToCart}
                 className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-4 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 <Icon name="cart" size={19} />
-                {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+
+                {addingToCart
+                  ? 'Adding...'
+                  : product.stock > 0
+                    ? 'Add to Cart'
+                    : 'Out of Stock'}
               </button>
+
+              {cartMessage && (
+                <div
+                  className={`mt-4 rounded-xl px-4 py-3 text-sm ${
+                    cartMessage === 'Product added to cart'
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'bg-red-50 text-red-600'
+                  }`}
+                >
+                  {cartMessage}
+                </div>
+              )}
+
+              {cartMessage === 'Product added to cart' && (
+                <Link
+                  to="/cart"
+                  className="mt-3 text-center text-sm font-medium text-slate-700 underline underline-offset-4 hover:text-emerald-700"
+                >
+                  View cart
+                </Link>
+              )}
             </div>
           </div>
 
