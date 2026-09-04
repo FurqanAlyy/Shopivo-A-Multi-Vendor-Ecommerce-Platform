@@ -18,6 +18,12 @@ import AddProduct from './pages/seller/AddProduct'
 import EditProduct from './pages/seller/EditProduct'
 import SellerOrders from './pages/seller/SellerOrders'
 import SellerOrderDetails from './pages/seller/SellerOrderDetails'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminSellers from './pages/admin/AdminSellers'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminProducts from './pages/admin/AdminProducts'
+import AdminOrders from './pages/admin/AdminOrders'
+import AdminOrderDetails from './pages/admin/AdminOrderDetails'
 
 const App = () => {
   return (
@@ -68,6 +74,19 @@ const App = () => {
   <Route
     path="/seller/orders/:id"
     element={<SellerOrderDetails />}
+  />
+
+        </Route>
+
+        <Route element={<ProtectedRoute roles={['admin']} />}>
+         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+           <Route path="/admin/sellers" element={<AdminSellers />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route
+             path="/admin/orders/:id"
+             element={<AdminOrderDetails />}
   />
 
         </Route>
