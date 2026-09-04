@@ -63,16 +63,6 @@ const productUpdateValidation = [
     .isMongoId()
     .withMessage('Invalid category ID'),
 
-  body('images')
-    .optional()
-    .isArray({ min: 1 })
-    .withMessage('At least one product image is required'),
-
-  body('images.*')
-    .optional()
-    .isURL()
-    .withMessage('Each image must be a valid URL'),
-
   body('price')
     .optional()
     .isFloat({ min: 0 })

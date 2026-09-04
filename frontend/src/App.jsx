@@ -15,6 +15,9 @@ import SellerDashboard from './pages/seller/SellerDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import MyProducts from './pages/seller/MyProducts'
 import AddProduct from './pages/seller/AddProduct'
+import EditProduct from './pages/seller/EditProduct'
+import SellerOrders from './pages/seller/SellerOrders'
+import SellerOrderDetails from './pages/seller/SellerOrderDetails'
 
 const App = () => {
   return (
@@ -52,9 +55,21 @@ const App = () => {
           />
 
           <Route
-    path="/seller/products/new"
-    element={<AddProduct />}
+            path="/seller/products/new"
+            element={<AddProduct />}
+           />
+             <Route path="/seller/products/:id/edit" element={<EditProduct />} />
+
+              <Route
+    path="/seller/orders"
+    element={<SellerOrders />}
   />
+
+  <Route
+    path="/seller/orders/:id"
+    element={<SellerOrderDetails />}
+  />
+
         </Route>
 
         <Route path="/login" element={<Login />} />

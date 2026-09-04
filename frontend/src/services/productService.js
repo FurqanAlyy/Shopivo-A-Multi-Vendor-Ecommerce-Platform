@@ -38,3 +38,13 @@ export const createProduct = async productData => {
 
   return response.data
 }
+
+export const updateProduct = async (id, productData) => {
+  const response = await api.patch(`/products/seller/${id}`, productData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+
+  return response.data
+}
