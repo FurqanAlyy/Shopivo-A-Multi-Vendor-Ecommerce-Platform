@@ -45,12 +45,12 @@ const ProductCard = ({ product }) => {
 
         <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="font-bold text-slate-900">
-            Rs. {discountedPrice.toFixed(0)}
+            ${discountedPrice.toFixed(0)}
           </span>
 
           {product.discount > 0 && (
             <span className="text-sm text-slate-400 line-through">
-              Rs. {product.price.toFixed(0)}
+              ${product.price.toFixed(0)}
             </span>
           )}
         </div>

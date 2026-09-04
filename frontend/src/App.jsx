@@ -6,6 +6,7 @@ import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Orders from './pages/Orders'
 import OrderDetails from './pages/OrderDetails'
+import Profile from './pages/Profile'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
 import PaymentSuccess from './pages/payment/PaymentSuccess'
@@ -33,7 +34,9 @@ const App = () => {
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetails />} />
 
-        <Route element={<ProtectedRoute roles={['buyer', 'seller']} />}>
+        {/* Authenticated User Routes */}
+        <Route element={<ProtectedRoute roles={['buyer', 'seller', 'admin']} />}>
+          <Route path="/profile" element={<Profile />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
@@ -43,6 +46,7 @@ const App = () => {
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment/cancel" element={<PaymentCancel />} />
 
+        {/* Buyer-only Routes */}
         <Route element={<ProtectedRoute roles={['buyer']} />}>
           <Route
             path="/seller/apply"
@@ -50,6 +54,7 @@ const App = () => {
           />
         </Route>
 
+        {/* Seller Routes */}
         <Route element={<ProtectedRoute roles={['seller']} />}>
           <Route
             path="/seller/dashboard"
@@ -59,38 +64,38 @@ const App = () => {
             path="/seller/products"
             element={<MyProducts />}
           />
-
           <Route
             path="/seller/products/new"
             element={<AddProduct />}
-           />
-             <Route path="/seller/products/:id/edit" element={<EditProduct />} />
-
-              <Route
-    path="/seller/orders"
-    element={<SellerOrders />}
-  />
-
-  <Route
-    path="/seller/orders/:id"
-    element={<SellerOrderDetails />}
-  />
-
+          />
+          <Route
+            path="/seller/products/:id/edit"
+            element={<EditProduct />}
+          />
+          <Route
+            path="/seller/orders"
+            element={<SellerOrders />}
+          />
+          <Route
+            path="/seller/orders/:id"
+            element={<SellerOrderDetails />}
+          />
         </Route>
 
+        {/* Admin Routes */}
         <Route element={<ProtectedRoute roles={['admin']} />}>
-         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-           <Route path="/admin/sellers" element={<AdminSellers />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/products" element={<AdminProducts />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route
-             path="/admin/orders/:id"
-             element={<AdminOrderDetails />}
-  />
-
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/sellers" element={<AdminSellers />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route
+            path="/admin/orders/:id"
+            element={<AdminOrderDetails />}
+          />
         </Route>
 
+        {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>

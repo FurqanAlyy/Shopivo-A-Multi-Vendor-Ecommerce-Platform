@@ -173,7 +173,7 @@ const PaymentSuccess = () => {
             </span>
 
             <span className="text-sm font-semibold text-slate-900">
-              Rs. {order.total.toLocaleString()}
+              ${order.total.toLocaleString()}
             </span>
           </div>
         </div>

@@ -195,7 +195,7 @@ const Orders = () => {
                         </p>
 
                         <p className="mt-1 font-semibold text-slate-900">
-                          Rs. {formatAmount(order.total)}
+                          ${formatAmount(order.total)}
                         </p>
                       </div>
 

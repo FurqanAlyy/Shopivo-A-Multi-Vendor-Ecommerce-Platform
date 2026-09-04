@@ -140,12 +140,16 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <div className="hidden items-center gap-2 lg:flex">
-                <p
+                <Link
                   to="/profile"
-                  className="max-w-[130px] truncate rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700"
+                  className={`max-w-[130px] truncate rounded-lg px-3 py-2 text-sm font-medium transition ${
+                    isActive('/profile')
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-700'
+                  }`}
                 >
                   Hi, {user.name}
-                </p>
+                </Link>
 
                 {user.role === 'buyer' && (
                   <Link
@@ -323,7 +327,11 @@ const Navbar = () => {
                   <Link
                     to="/profile"
                     onClick={closeMenu}
-                    className="block rounded-xl px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-emerald-700"
+                    className={`block rounded-xl px-4 py-3 text-sm font-medium transition ${
+                      isActive('/profile')
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-700'
+                    }`}
                   >
                     Hi, {user.name}
                   </Link>

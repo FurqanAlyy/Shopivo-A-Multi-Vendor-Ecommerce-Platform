@@ -1,7 +1,6 @@
 import PromotionBar from '../components/home/PromotionBar'
 import Navbar from '../components/home/Navbar'
 import Hero from '../components/home/Hero'
-import Benefits from '../components/home/Benefits'
 import Categories from '../components/home/Categories'
 import TrendingProducts from '../components/home/TrendingProducts'
 import MarketplaceBanner from '../components/home/MarketplaceBanner'
@@ -17,7 +16,6 @@ const Home = () => {
 
       <main>
         <Hero />
-        <Benefits />
         <Categories />
         <TrendingProducts />
         <MarketplaceBanner />

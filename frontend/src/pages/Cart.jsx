@@ -317,12 +317,12 @@ const handleClearCart = async () => {
 
                           <div className="mt-3 flex items-center gap-2">
                             <span className="font-semibold text-slate-900">
-                              Rs. {price.toLocaleString()}
+                              ${price.toLocaleString()}
                             </span>
 
                             {product.discount > 0 && (
                               <span className="text-sm text-slate-400 line-through">
-                                Rs. {product.price.toLocaleString()}
+                                ${product.price.toLocaleString()}
                               </span>
                             )}
                           </div>
@@ -369,7 +369,7 @@ const handleClearCart = async () => {
                             </div>
 
                             <p className="font-semibold text-slate-900">
-                              Rs. {itemTotal.toLocaleString()}
+                               ${itemTotal.toLocaleString()}
                             </p>
                           </div>
 
@@ -405,7 +405,7 @@ const handleClearCart = async () => {
                     </span>
 
                     <span className="font-medium text-slate-900">
-                      Rs. {subtotal.toLocaleString()}
+                      ${subtotal.toLocaleString()}
                     </span>
                   </div>
 
@@ -424,7 +424,7 @@ const handleClearCart = async () => {
                     </span>
 
                     <span className="text-xl font-semibold text-slate-900">
-                      Rs. {subtotal.toLocaleString()}
+                      ${subtotal.toLocaleString()}
                     </span>
                   </div>
                 </div>

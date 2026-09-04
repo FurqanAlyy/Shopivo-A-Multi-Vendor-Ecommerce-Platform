@@ -160,7 +160,7 @@ const uploadImages = async () => {
 
 const createUsers = async () => {
   const admin = await User.create({
-    name: 'Shopivo Admin',
+    name: 'Admin',
     email: 'admin@shopivo.com',
     password: 'Admin@12345',
     role: 'admin'
@@ -174,8 +174,8 @@ const createUsers = async () => {
       role: 'seller'
     },
     {
-      name: 'Hamza Khan',
-      email: 'hamza@gadgetzone.com',
+      name: 'Furqan Ali',
+      email: 'furqan@gadgetzone.com',
       password: 'Seller@12345',
       role: 'seller'
     },

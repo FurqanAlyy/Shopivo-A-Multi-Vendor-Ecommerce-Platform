@@ -487,7 +487,7 @@ const Checkout = () => {
                         </p>
 
                         <p className="mt-1 text-sm font-semibold text-slate-900">
-                          Rs.{' '}
+                          ${' '}
                           {(price * item.quantity).toLocaleString()}
                         </p>
                       </div>
@@ -502,7 +502,7 @@ const Checkout = () => {
                 <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
                   <span className="font-medium text-slate-900">
-                    Rs. {subtotal.toLocaleString()}
+                    ${subtotal.toLocaleString()}
                   </span>
                 </div>
 
@@ -522,7 +522,7 @@ const Checkout = () => {
                     Total
                   </p>
                   <p className="mt-1 text-2xl font-semibold text-slate-900">
-                    Rs. {total.toLocaleString()}
+                    ${total.toLocaleString()}
                   </p>
                 </div>
               </div>

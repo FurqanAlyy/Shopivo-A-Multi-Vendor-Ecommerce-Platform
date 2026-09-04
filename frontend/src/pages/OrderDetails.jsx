@@ -194,7 +194,7 @@ const OrderDetails = () => {
               </p>
 
               <p className="mt-1 font-semibold text-slate-900">
-                Rs. {formatAmount(order.total)}
+                ${formatAmount(order.total)}
               </p>
             </div>
           </div>
@@ -268,7 +268,7 @@ const OrderDetails = () => {
                         </p>
 
                         <p className="mt-1 text-sm text-slate-500">
-                          Unit price: Rs.{' '}
+                          Unit price: ${' '}
                           {formatAmount(item.unitPrice)}
                         </p>
 
@@ -281,7 +281,7 @@ const OrderDetails = () => {
 
                       <div className="text-right">
                         <p className="font-semibold text-slate-900">
-                          Rs.{' '}
+                          ${' '}
                           {formatAmount(item.totalPrice)}
                         </p>
                       </div>
@@ -296,7 +296,7 @@ const OrderDetails = () => {
                     </span>
 
                     <span className="font-semibold text-slate-900">
-                      Rs.{' '}
+                      ${' '}
                       {formatAmount(sellerOrder.subtotal)}
                     </span>
                   </div>
@@ -321,7 +321,7 @@ const OrderDetails = () => {
                     </span>
 
                     <span className="font-semibold text-slate-900">
-                      Rs. {formatAmount(sellerOrder.total)}
+                      ${formatAmount(sellerOrder.total)}
                     </span>
                   </div>
                 </div>
@@ -369,7 +369,7 @@ const OrderDetails = () => {
                   </span>
 
                   <span className="font-medium text-slate-900">
-                    Rs. {formatAmount(order.subtotal)}
+                    ${formatAmount(order.subtotal)}
                   </span>
                 </div>
 
@@ -381,7 +381,7 @@ const OrderDetails = () => {
                   <span className="font-medium text-emerald-700">
                     {Number(order.shippingFee || 0) === 0
                       ? 'Free'
-                      : `Rs. ${formatAmount(
+                      : `$${formatAmount(
                           order.shippingFee
                         )}`}
                   </span>
@@ -396,7 +396,7 @@ const OrderDetails = () => {
                 </span>
 
                 <span className="text-xl font-semibold text-slate-900">
-                  Rs. {formatAmount(order.total)}
+                  ${formatAmount(order.total)}
                 </span>
               </div>
 
